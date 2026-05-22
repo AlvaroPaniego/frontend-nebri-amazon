@@ -1,53 +1,27 @@
 :root {
-  /* Brand Color Palette - NebriAmazon Premium Theme */
-  --color-primary: hsl(220, 27%, 10%);       /* Navy Blue (#131921) */
-  --color-primary-light: hsl(220, 27%, 16%); /* Nav background (#232F3E) */
-  --color-accent: hsl(36, 100%, 50%);         /* Amazon Accent Orange (#FF9900) */
-  --color-accent-hover: hsl(36, 100%, 45%);   /* Active Accent */
-  --color-background: hsl(220, 20%, 97%);    /* Ultra Light Gray for content backdrops */
-  --color-surface: hsl(0, 0%, 100%);         /* Pure white for cards and modules */
-  --color-text: hsl(220, 20%, 15%);          /* Dark carbon text for high readability */
-  --color-text-muted: hsl(220, 10%, 48%);    /* Soft slate gray for subtitles */
-  --color-border: hsl(220, 12%, 88%);        /* Clean subtle borders */
+  /* Paleta de Colores de Marca (NebriAmazon Core) */
+  --color-primary: hsl(220, 27%, 10%);       /* Azul Oscuro Premium (#131921) */
+  --color-primary-light: hsl(220, 27%, 16%); /* Azul Navbar secundario */
+  --color-accent: hsl(36, 100%, 50%);         /* Naranja de Acento Amazon (#FF9900) */
+  --color-accent-hover: hsl(36, 100%, 45%);   /* Naranja activo */
+  --color-background: hsl(0, 0%, 97%);       /* Gris ultra claro de fondo */
+  --color-surface: hsl(0, 0%, 100%);         /* Blanco puro de tarjetas */
+  --color-text: hsl(220, 20%, 15%);          /* Negro carbón de legibilidad */
+  --color-text-muted: hsl(220, 10%, 50%);    /* Gris intermedio para textos auxiliares */
+  --color-border: hsl(220, 12%, 88%);        /* Bordes sutiles y limpios */
   
-  /* System States */
-  --color-success: hsl(142, 70%, 45%);       /* Emerald green for active stock */
-  --color-error: hsl(0, 84%, 60%);           /* Fire red for out of stock */
-  --color-warning: hsl(45, 93%, 47%);        /* Amber gold for low stock */
-
-  /* Glassmorphism Effect Tokens */
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --glass-backdrop: blur(16px);
+  /* Estados */
+  --color-success: hsl(142, 70%, 45%);       /* Verde stock / confirmación */
+  --color-error: hsl(0, 84%, 60%);           /* Rojo alertas / stock agotado */
+  --color-warning: hsl(45, 93%, 47%);        /* Amarillo advertencias */
   
-  /* Typography Hierarchy */
-  --font-title: 'Outfit', 'Inter', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
+  /* Tipografías y Sombras */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.12);
   
-  /* Shadows & Elevations */
-  --shadow-sm: 0 2px 4px rgba(19, 25, 33, 0.04);
-  --shadow-md: 0 8px 16px rgba(19, 25, 33, 0.06);
-  --shadow-lg: 0 16px 32px rgba(19, 25, 33, 0.08);
-  --shadow-glass: 0 8px 32px 0 rgba(19, 25, 33, 0.08);
-  
-  /* Border Radius */
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  --radius-round: 50%;
-  
-  /* Timing and Transitions */
+  /* Transiciones Estándar */
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Light / Dark Mode dynamic base color settings for standard elements */
-body {
-  margin: 0;
-  font-family: var(--font-body);
-  background-color: var(--color-background);
-  color: var(--color-text);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
