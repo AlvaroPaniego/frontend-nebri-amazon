@@ -1,0 +1,27 @@
+:root {
+  /* Paleta de Colores de Marca (NebriAmazon Core) */
+  --color-primary: hsl(220, 27%, 10%);       /* Azul Oscuro Premium (#131921) */
+  --color-primary-light: hsl(220, 27%, 16%); /* Azul Navbar secundario */
+  --color-accent: hsl(36, 100%, 50%);         /* Naranja de Acento Amazon (#FF9900) */
+  --color-accent-hover: hsl(36, 100%, 45%);   /* Naranja activo */
+  --color-background: hsl(0, 0%, 97%);       /* Gris ultra claro de fondo */
+  --color-surface: hsl(0, 0%, 100%);         /* Blanco puro de tarjetas */
+  --color-text: hsl(220, 20%, 15%);          /* Negro carbón de legibilidad */
+  --color-text-muted: hsl(220, 10%, 50%);    /* Gris intermedio para textos auxiliares */
+  --color-border: hsl(220, 12%, 88%);        /* Bordes sutiles y limpios */
+  
+  /* Estados */
+  --color-success: hsl(142, 70%, 45%);       /* Verde stock / confirmación */
+  --color-error: hsl(0, 84%, 60%);           /* Rojo alertas / stock agotado */
+  --color-warning: hsl(45, 93%, 47%);        /* Amarillo advertencias */
+  
+  /* Tipografías y Sombras */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.12);
+  
+  /* Transiciones Estándar */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
