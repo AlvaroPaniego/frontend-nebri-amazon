@@ -239,4 +239,4 @@ El desarrollo del frontend sigue un flujo de **feature branches** secuenciales, 
 
 ---
 
-*Proyecto académico — Universidad Nebrija · IABD (G1) · Programación de IA · 2025*
+*Proyecto académico — Universidad Nebrija · IABD (G1) · Programación de IA · 2026*
