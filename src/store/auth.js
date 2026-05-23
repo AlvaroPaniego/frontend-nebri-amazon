@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { useCartStore } from './cart';
 
 // Helper de utilidad para simular latencia de red de forma limpia sin callback hell (Clean Code)
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -77,10 +78,9 @@ export const useAuthStore = defineStore('auth', () => {
       };
 
       // Tarea de la Iteración 4 (Roadmap, Apartado 8):
-      // En la Iteración 4 se importará 'useCartStore' y se invocará la sincronización
-      // del carrito de compras local con el servidor aquí:
-      // const cartStore = useCartStore();
-      // if (cartStore && typeof cartStore.initializeCart === 'function') { await cartStore.initializeCart(); }
+      // Sincronización del carrito de compras local con el servidor al iniciar sesión
+      const cartStore = useCartStore();
+      await cartStore.initializeCart();
 
       return user.value;
     } finally {
@@ -129,6 +129,11 @@ export const useAuthStore = defineStore('auth', () => {
         role: 'user' // Por defecto los registros son de tipo cliente estándar
       };
 
+      // Tarea de la Iteración 4 (Roadmap, Apartado 8):
+      // Sincronización del carrito tras el registro y login automático de forma fluida
+      const cartStore = useCartStore();
+      await cartStore.initializeCart();
+
       return user.value;
     } finally {
       loading.value = false;
@@ -157,10 +162,9 @@ export const useAuthStore = defineStore('auth', () => {
       localStorage.removeItem('auth_token');
 
       // Tarea de las Iteraciones 3 y 4 (Roadmap, Apartado 8):
-      // Vaciar por completo los stores de carrito y productos para evitar contaminación
-      // de datos entre sesiones:
-      // const cartStore = useCartStore();
-      // if (cartStore && typeof cartStore.clearCart === 'function') { cartStore.clearCart(); }
+      // Vaciar por completo los stores de carrito y productos para evitar contaminación de datos entre sesiones
+      const cartStore = useCartStore();
+      await cartStore.clearCart();
       // const productStore = useProductStore();
       // if (productStore && typeof productStore.resetState === 'function') { productStore.resetState(); }
 
@@ -220,6 +224,10 @@ export const useAuthStore = defineStore('auth', () => {
           email: email,
           role: role
         };
+
+        // Sincronizar el carrito del usuario recuperado al inicializar o recargar la app
+        const cartStore = useCartStore();
+        await cartStore.initializeCart();
 
         return user.value;
       } else {
