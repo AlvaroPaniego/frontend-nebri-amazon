@@ -91,6 +91,9 @@ const simulateApiCall = async (payload) => {
 
 // ─── API Pública del Servicio ──────────────────────────────────
 
+/** Comprueba si el error ya viene tipado desde el interceptor de api.js */
+const isTypedError = (err) => !!(err?.status && err?.code);
+
 /**
  * placeOrder — Tarea 3, Iteración 5 (Fase 5)
  *
@@ -98,6 +101,11 @@ const simulateApiCall = async (payload) => {
  * disponible (error de red / timeout), cae al motor de simulación
  * para garantizar que el flujo de checkout es siempre operable
  * en modo de desarrollo o demostración.
+ *
+ * Seguridad por diseño (M1-fix):
+ *   - backendPayload nunca contiene el PAN completo; solo los últimos 4 dígitos.
+ *   - simulationPayload incluye el PAN exclusivamente para el motor local;
+ *     nunca viaja a ningún servidor externo.
  *
  * @param {Object} shippingData   - Datos de envío { fullName, address, city, postalCode, country }
  * @param {Object} paymentData    - Datos de pago  { cardholderName, cardNumber, expiry, cvv }
@@ -107,44 +115,49 @@ const simulateApiCall = async (payload) => {
  * @throws {Object}               - Error tipado { status, code, message }
  */
 export const placeOrder = async (shippingData, paymentData, cartItems, orderTotal) => {
-  // El CVV nunca viaja al backend en texto plano; lo enmascaramos antes de enviar.
+  const rawCardNumber = paymentData.cardNumber.replace(/\s/g, '');
+
+  // Payload seguro para el backend real: el CVV y el PAN completo NO viajan al servidor.
+  // En producción real se sustituiría cardLastFour por el token opaco de la pasarela.
   const sanitizedPayment = {
     cardholderName: paymentData.cardholderName,
-    // Solo los últimos 4 dígitos se envían; el número completo solo sirve
-    // para la validación local (algoritmo Luhn) dentro del componente.
-    cardLastFour: paymentData.cardNumber.replace(/\s/g, '').slice(-4),
-    expiry: paymentData.expiry,
+    cardLastFour:   rawCardNumber.slice(-4),
+    expiry:         paymentData.expiry,
   };
 
-  const orderPayload = {
+  const sharedItems = cartItems.map((item) => ({
+    productId: item.product.id,
+    sku:       item.product.sku,
+    quantity:  item.quantity,
+    unitPrice: item.product.price,
+  }));
+
+  // Payload que viaja al backend real — PAN ausente por diseño
+  const backendPayload = {
     shipping: shippingData,
-    payment: {
-      // Enviamos el número completo únicamente para la simulación interna;
-      // en producción real se sustituiría por un token de la pasarela (Stripe, etc.).
-      cardNumber: paymentData.cardNumber,
-      ...sanitizedPayment,
-    },
-    items: cartItems.map((item) => ({
-      productId: item.product.id,
-      sku: item.product.sku,
-      quantity: item.quantity,
-      unitPrice: item.product.price,
-    })),
-    total: orderTotal,
+    payment:  sanitizedPayment,
+    items:    sharedItems,
+    total:    orderTotal,
+  };
+
+  // Payload solo para el motor de simulación local — nunca enviado a ningún servidor
+  const simulationPayload = {
+    ...backendPayload,
+    payment: { ...sanitizedPayment, cardNumber: rawCardNumber },
   };
 
   try {
     // Intento real contra el backend — si Axios lanza, pasamos al simulador
-    const response = await api.post('/orders', orderPayload);
+    const response = await api.post('/orders', backendPayload);
     return response.data;
   } catch (networkOrServerError) {
     // Si el error ya es tipado (viene del interceptor con status/code), lo propagamos
-    if (networkOrServerError?.status && networkOrServerError?.code) {
+    if (isTypedError(networkOrServerError)) {
       throw networkOrServerError;
     }
 
-    // Error de red (sin conexión, CORS, timeout) → usamos simulación
+    // Error de red (sin conexión, CORS, timeout) → usamos simulación con el payload completo
     console.warn('[orderService] Backend inaccesible — activando motor de simulación.');
-    return simulateApiCall(orderPayload);
+    return simulateApiCall(simulationPayload);
   }
 };

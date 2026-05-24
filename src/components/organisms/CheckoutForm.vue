@@ -18,7 +18,7 @@
  * (Principio de Responsabilidad Única — Clean Code, Capítulo 3)
  */
 
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 
 // ─── Props & Emits ─────────────────────────────────────────────
 const props = defineProps({
@@ -125,7 +125,8 @@ const errors = computed(() => ({
     : '',
   expiry: (() => {
     const parts = payment.value.expiry.split('/');
-    if (parts.length !== 2) return 'Formato inválido (MM/AA).';
+    // M5-fix: validar que ambas partes existen y el año tenga exactamente 2 dígitos
+    if (parts.length !== 2 || parts[1].length !== 2) return 'Formato inválido (MM/AA).';
     const month = parseInt(parts[0], 10);
     const year  = parseInt(`20${parts[1]}`, 10);
     if (month < 1 || month > 12) return 'Mes inválido (01–12).';

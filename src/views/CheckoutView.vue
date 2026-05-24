@@ -42,6 +42,18 @@ const itemsCount = computed(() => cartStore.totalItemsCount);
 const resolveProductImage = (product) =>
   product?.image_urls?.[0] ?? `https://placehold.co/56x56/131921/FF9900?text=${encodeURIComponent(product?.name?.[0] ?? '?')}`;
 
+/**
+ * M2-fix: cálculo de subtotal de línea con escalado en centavos.
+ * Misma estrategia que useCartStore para evitar imprecisiones de punto flotante
+ * en los subtotales individuales mostrados en el resumen de la orden.
+ * @param {Object} item - Ítem del carrito { product: { price }, quantity }
+ * @returns {string} Total formateado con exactamente 2 decimales
+ */
+const lineTotal = (item) => {
+  const priceCents = Math.round(parseFloat(item.product.price) * 100);
+  return Number((priceCents * item.quantity / 100).toFixed(2)).toFixed(2);
+};
+
 // ─── Acción principal: procesar la orden ───────────────────────
 /**
  * handleFormSubmit — Tarea 4, Iteración 5
