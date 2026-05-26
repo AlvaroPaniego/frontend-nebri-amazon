@@ -1,16 +1,20 @@
 <script setup>
-import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useProductStore } from '@/store/products'
 
 const emit = defineEmits(['search'])
 
-const searchQuery = ref('')
+const productStore = useProductStore()
+const { searchQuery } = storeToRefs(productStore)
 
 const handleSearch = () => {
+  productStore.setSearchQuery(searchQuery.value)
   emit('search', searchQuery.value)
 }
 
 const handleClear = () => {
   searchQuery.value = ''
+  productStore.setSearchQuery('')
   emit('search', '')
 }
 </script>
