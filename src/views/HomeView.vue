@@ -18,14 +18,18 @@
 
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+
+// ─── IMPORTACIONES CORREGIDAS  ───
 import { useCartStore } from '@/store/cart';
 import { useAuthStore } from '@/store/auth';
+import { useProductStore } from '@/store/products';
+
 import AppNavbar from '@/components/organisms/AppNavbar.vue';
 import ChatbotWidget from '@/components/organisms/ChatbotWidget.vue';
 import ProductGrid from '@/components/organisms/ProductGrid.vue';
-import { useProductStore } from '@/store/products';
-import { storeToRefs } from 'pinia';
-import CategoryGrid from '@/components/organisms/CategoryGrid.vue';
+// He comentado CategoryGrid temporalmente hasta que crees el archivo físico
+//import CategoryGrid from '@/components/organisms/CategoryGrid.vue';
 
 const router = useRouter();
 const cartStore = useCartStore();
@@ -69,6 +73,16 @@ async function restoreUserSession() {
 const goToCatalog = () => router.push({ name: 'Catalog' });
 const goToLogin = () => router.push({ name: 'Login' });
 const goToRegister = () => router.push({ name: 'Register' });
+
+const handleNavigation = (destination) => {
+  if (destination === 'Login') {
+    goToLogin();
+  } else if (destination === 'Catalog') {
+    goToCatalog();
+  }
+};
+
+
 </script>
 
 <template>
@@ -77,7 +91,10 @@ const goToRegister = () => router.push({ name: 'Register' });
     <!-- ══ CABECERA GLOBAL ══════════════════════════════════════ -->
     <!-- AppNavbar gestiona su propio estado interno (búsqueda, menú  -->
     <!-- móvil). Solo necesita el conteo del carrito para el BaseBadge -->
-    <AppNavbar :cart-count="totalItemsCount" />
+    <AppNavbar 
+       :cart-count="totalItemsCount"
+       @navigate="handleNavigation"
+     />
 
     <!-- ══ CONTENIDO PRINCIPAL ══════════════════════════════════ -->
     <main class="home-container" id="main-content" tabindex="-1">
@@ -181,6 +198,8 @@ const goToRegister = () => router.push({ name: 'Register' });
         </article>
       </section>
 
+
+      ``
       <!-- ── SECCIÓN DE CATEGORÍAS  ──────────────────── -->
       <section class="categories-section" aria-labelledby="categories-heading">
         <header class="section-header">
@@ -191,6 +210,7 @@ const goToRegister = () => router.push({ name: 'Register' });
         <!-- CategoryGrid maneja de forma aislada su lógica de la Iteración anterior -->
         <CategoryGrid />
       </section>
+      ``
 
       <!-- ── SECCIÓN DE CATÁLOGO EN PORTADA ───────────────────── -->
       <section class="featured-catalog-section" aria-labelledby="catalog-heading">

@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useProductStore } from '@/store/products';
-import ProductCard from '../atoms/ProductCard.vue';
+import ProductCard from '@/components/atoms/ProductCard.vue';
 
 const productStore = useProductStore();
 const { loading, error } = storeToRefs(productStore);
