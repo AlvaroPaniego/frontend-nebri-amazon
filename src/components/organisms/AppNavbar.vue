@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
-import SearchBar from '../molecules/SearchBar.vue'
-import BaseBadge from '../atoms/BaseBadge.vue'
+import SearchBar from '@/components/molecules/SearchBar.vue'
+import BaseBadge from '@/components/atoms/BaseBadge.vue'
 
 defineProps({
   cartCount: {
@@ -43,7 +43,7 @@ const toggleMobileMenu = () => {
 
       <!-- Menú de Acciones de Usuario y Carrito -->
       <div class="navbar-actions" :class="{ 'mobile-open': isMobileMenuOpen }">
-        <div class="action-item" @click="handleNavigation('profile')" role="button" tabindex="0">
+        <div class="action-item" @click="handleNavigation('Login')" role="button" tabindex="0">
           <span class="action-subtext">Hola, Identifícate</span>
           <span class="action-text">Cuenta y Listas</span>
         </div>

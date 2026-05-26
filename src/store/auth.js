@@ -11,10 +11,10 @@ export const useAuthStore = defineStore('auth', () => {
   // =========================================================================
   // token: Almacena el token JWT. Se inicializa recuperándolo de localStorage de forma segura.
   const token = ref(localStorage.getItem('auth_token') || null);
-  
+
   // user: Objeto que contiene los datos del usuario autenticado (id, name, email, role).
   const user = ref(null);
-  
+
   // loading: Booleano para manejar estados de carga y deshabilitar interacciones durante llamadas asíncronas.
   const loading = ref(false);
 
@@ -61,7 +61,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       // Generación de un token JWT mockeado seguro basado en el email
       const mockToken = `mock-jwt-token-${btoa(email)}`;
-      
+
       // Actualización de estado y persistencia local
       token.value = mockToken;
       localStorage.setItem('auth_token', mockToken);
@@ -69,7 +69,7 @@ export const useAuthStore = defineStore('auth', () => {
       // Asignación de rol de administrador si el correo contiene 'admin'
       const role = email.includes('admin') ? 'admin' : 'user';
       const name = email.split('@')[0];
-      
+
       user.value = {
         id: 1, // ID ficticio
         name: name.charAt(0).toUpperCase() + name.slice(1),
@@ -118,7 +118,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       // Generación automática de sesión post-registro
       const mockToken = `mock-jwt-token-${btoa(email)}`;
-      
+
       token.value = mockToken;
       localStorage.setItem('auth_token', mockToken);
 

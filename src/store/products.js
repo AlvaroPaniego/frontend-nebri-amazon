@@ -12,7 +12,7 @@ export const useProductStore = defineStore('products', () => {
   const selectedCategory = ref(null);
   const loading = ref(false);
   const error = ref(null);
-  
+
   // Caché indexado para evitar peticiones redundantes a la red
   const cache = ref({
     products: null,
@@ -23,7 +23,7 @@ export const useProductStore = defineStore('products', () => {
   // =========================================================================
   // GETTERS (Reactivos)
   // =========================================================================
-  
+
   /**
    * getFilteredProducts - Combina reactivamente la búsqueda de texto y el
    * filtro por categoría seleccionada para entregar un resultado instantáneo.
