@@ -6,8 +6,7 @@
 import api from './api';
 
 export const syncCart = async (cartId, items) => {
-  // Nota: El backend no expone un endpoint "syncCart", usaremos GET /cart
-  const response = await api.get('/cart');
+  const response = await api.post('/cart/sync', { items });
   return response.data;
 };
 
@@ -27,7 +26,6 @@ export const removeCartItem = async (cartId, itemId) => {
 };
 
 export const clearCart = async (cartId) => {
-  // Nota: El backend no expone un endpoint DELETE /cart
-  // Lanzamos un error por falta de endpoint.
-  throw new Error('Endpoint DELETE /api/cart no disponible en el backend');
+  const response = await api.delete('/cart');
+  return response.data;
 };
