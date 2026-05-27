@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useCartStore } from '@/store/cart'
+import { useAuthStore } from '@/store/auth'
 import SearchBar from '@/components/molecules/SearchBar.vue'
 import BaseBadge from '@/components/atoms/BaseBadge.vue'
 
@@ -18,6 +19,8 @@ const emit = defineEmits(['search', 'navigate'])
 const router = useRouter()
 const cartStore = useCartStore()
 const { totalItemsCount } = storeToRefs(cartStore)
+const authStore = useAuthStore()
+const { isAuthenticated, user } = storeToRefs(authStore)
 
 const isMobileMenuOpen = ref(false)
 
@@ -42,6 +45,11 @@ const handleNavigation = (destination) => {
   }
 }
 
+const handleLogout = async () => {
+  await authStore.logout()
+  isMobileMenuOpen.value = false
+}
+
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
 }
@@ -62,9 +70,27 @@ const toggleMobileMenu = () => {
 
       <!-- Menú de Acciones de Usuario y Carrito -->
       <div class="navbar-actions" :class="{ 'mobile-open': isMobileMenuOpen }">
-        <div class="action-item" @click="handleNavigation('Login')" role="button" tabindex="0">
+        <div 
+          v-if="!isAuthenticated" 
+          class="action-item" 
+          @click="handleNavigation('Login')" 
+          role="button" 
+          tabindex="0"
+          aria-label="Iniciar sesión"
+        >
           <span class="action-subtext">Hola, Identifícate</span>
           <span class="action-text">Cuenta y Listas</span>
+        </div>
+        <div 
+          v-else 
+          class="action-item user-profile-action" 
+          @click="handleLogout" 
+          role="button" 
+          tabindex="0"
+          aria-label="Cerrar sesión"
+        >
+          <span class="action-subtext">Hola, {{ user?.name }}</span>
+          <span class="action-text logout-btn">Cerrar Sesión</span>
         </div>
 
         <div class="action-item" @click="handleNavigation('orders')" role="button" tabindex="0">

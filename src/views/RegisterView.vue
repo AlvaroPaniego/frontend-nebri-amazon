@@ -1,14 +1,14 @@
 <script setup>
 /**
- * src/views/LoginView.vue
+ * src/views/RegisterView.vue
  * ─────────────────────────────────────────────────────────────
- * Vista de Inicio de Sesión de NebriAmazon.
+ * Vista de Registro de Usuario de NebriAmazon.
  *
- * Implementa el formulario de login centrado y premium con:
- *   1. Validación reactiva en cliente (email e inputs requeridos).
- *   2. Integración con Pinia authStore para persistencia de sesión.
- *   3. Cabecera global (AppNavbar) y pie de página coherentes.
- *   4. Estilo visual de alta calidad adaptado a la guía de marca.
+ * Implementa el formulario de registro con la misma consistencia visual y:
+ *   1. Campos para Nombre completo, Email, Contraseña y Confirmar Contraseña.
+ *   2. Validación en cliente reactiva (longitud de contraseña, coincidencia y formato email).
+ *   3. Integración con Pinia authStore para registro automático y login fluido.
+ *   4. Cabecera global (AppNavbar) y pie de página coherentes.
  */
 
 import { ref, computed } from 'vue';
@@ -28,19 +28,26 @@ const { totalItemsCount } = storeToRefs(cartStore);
 const { loading } = storeToRefs(authStore);
 
 // ─── Estado local del formulario ──────────────────────────────
+const fullName = ref('');
 const email = ref('');
 const password = ref('');
+const confirmPassword = ref('');
 const submitted = ref(false);
 const serverError = ref('');
 
 // ─── Validaciones reactivas (Clean Code) ───────────────────────
 const errors = computed(() => {
+  const nameVal = fullName.value.trim();
   const emailVal = email.value.trim();
   const passwordVal = password.value;
+  const confirmVal = confirmPassword.value;
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   return {
+    fullName: !nameVal 
+      ? 'El nombre completo es obligatorio.' 
+      : '',
     email: !emailVal 
       ? 'El correo electrónico es obligatorio.' 
       : !emailRegex.test(emailVal) 
@@ -50,6 +57,11 @@ const errors = computed(() => {
       ? 'La contraseña es obligatoria.' 
       : passwordVal.length < 6 
         ? 'La contraseña debe tener al menos 6 caracteres.' 
+        : '',
+    confirmPassword: !confirmVal 
+      ? 'Debes confirmar la contraseña.' 
+      : confirmVal !== passwordVal 
+        ? 'Las contraseñas no coinciden.' 
         : ''
   };
 });
@@ -59,7 +71,7 @@ const isFormValid = computed(() =>
 );
 
 // ─── Acciones de navegación ──────────────────────────────────
-const goToRegister = () => router.push({ name: 'Register' });
+const goToLogin = () => router.push({ name: 'Login' });
 const goToHome = () => router.push({ name: 'Home' });
 const goToCatalog = () => router.push({ name: 'Catalog' });
 
@@ -76,22 +88,23 @@ const handleNavigation = (destination) => {
 };
 
 // ─── Envío del formulario ──────────────────────────────────────
-const handleLoginSubmit = async () => {
+const handleRegisterSubmit = async () => {
   submitted.value = true;
   serverError.value = '';
 
   if (!isFormValid.value) return;
 
   try {
-    await authStore.login({
+    await authStore.register({
+      name: fullName.value,
       email: email.value,
       password: password.value
     });
     
-    // Login exitoso — redirección fluida a la home
+    // Registro exitoso — Redirección automática a Home
     goToHome();
   } catch (error) {
-    serverError.value = error?.message || 'Error al iniciar sesión. Inténtalo de nuevo.';
+    serverError.value = error?.message || 'Error al registrar la cuenta. Inténtalo de nuevo.';
   }
 };
 </script>
@@ -106,15 +119,15 @@ const handleLoginSubmit = async () => {
 
     <!-- ══ CONTENIDO PRINCIPAL CENTRADO ══════════════════════════ -->
     <main class="auth-container" id="main-content" tabindex="-1">
-      <section class="auth-card-wrapper" aria-labelledby="login-title">
+      <section class="auth-card-wrapper" aria-labelledby="register-title">
         <div class="auth-card">
           <!-- Logo secundario / Identidad -->
           <div class="auth-logo" @click="goToHome" role="button" tabindex="0" aria-label="Volver a Inicio">
             <span class="logo-text">Nebri<span class="logo-highlight">Amazon</span></span>
           </div>
 
-          <h1 id="login-title" class="auth-title">Iniciar Sesión</h1>
-          <p class="auth-subtitle">Accede a tus pedidos, listas y recomendaciones personalizadas.</p>
+          <h1 id="register-title" class="auth-title">Crear cuenta</h1>
+          <p class="auth-subtitle">Regístrate para realizar pedidos y disfrutar de envíos express.</p>
 
           <!-- Banner de error de servidor -->
           <div v-if="serverError" class="server-error-banner" role="alert" aria-live="assertive">
@@ -122,10 +135,23 @@ const handleLoginSubmit = async () => {
             {{ serverError }}
           </div>
 
-          <form class="auth-form" novalidate @submit.prevent="handleLoginSubmit">
+          <form class="auth-form" novalidate @submit.prevent="handleRegisterSubmit">
+            <!-- Nombre Completo -->
+            <BaseInput
+              id="register-name"
+              v-model="fullName"
+              label="Nombre completo"
+              type="text"
+              placeholder="Juan Pérez"
+              required
+              autocomplete="name"
+              :error="submitted ? errors.fullName : ''"
+              :disabled="loading"
+            />
+
             <!-- Email -->
             <BaseInput
-              id="login-email"
+              id="register-email"
               v-model="email"
               label="Correo electrónico"
               type="email"
@@ -138,49 +164,62 @@ const handleLoginSubmit = async () => {
 
             <!-- Contraseña -->
             <BaseInput
-              id="login-password"
+              id="register-password"
               v-model="password"
               label="Contraseña"
               type="password"
               placeholder="Mínimo 6 caracteres"
               required
-              autocomplete="current-password"
+              autocomplete="new-password"
               :error="submitted ? errors.password : ''"
+              :disabled="loading"
+            />
+
+            <!-- Confirmar Contraseña -->
+            <BaseInput
+              id="register-confirm-password"
+              v-model="confirmPassword"
+              label="Confirmar contraseña"
+              type="password"
+              placeholder="Repite la contraseña"
+              required
+              autocomplete="new-password"
+              :error="submitted ? errors.confirmPassword : ''"
               :disabled="loading"
             />
 
             <!-- Botón de Envío -->
             <button
-              id="login-submit-btn"
+              id="register-submit-btn"
               type="submit"
               class="auth-submit-btn"
               :disabled="loading"
               :aria-busy="loading"
-              aria-label="Entrar a NebriAmazon"
+              aria-label="Registrarse en NebriAmazon"
             >
               <span v-if="!loading" class="btn-content">
-                Entrar
+                Registrarse
               </span>
-              <span v-else class="btn-loading" aria-label="Iniciando sesión…">
+              <span v-else class="btn-loading" aria-label="Creando cuenta…">
                 <span class="spinner" aria-hidden="true"></span>
-                Iniciando sesión…
+                Creando cuenta…
               </span>
             </button>
           </form>
 
           <!-- Separador decorativo -->
           <div class="auth-divider">
-            <span class="divider-text">¿Eres nuevo en NebriAmazon?</span>
+            <span class="divider-text">¿Ya tienes cuenta?</span>
           </div>
 
           <!-- Enlace alternativo -->
           <button
             class="auth-alt-btn"
-            @click="goToRegister"
+            @click="goToLogin"
             :disabled="loading"
-            aria-label="Ir al formulario de registro"
+            aria-label="Ir al inicio de sesión"
           >
-            Crea tu cuenta de NebriAmazon
+            Inicia sesión aquí
           </button>
         </div>
       </section>
@@ -199,7 +238,7 @@ const handleLoginSubmit = async () => {
         <nav class="footer-nav" aria-label="Navegación del pie de página">
           <button class="footer-link" @click="goToCatalog">Catálogo</button>
           <span class="footer-sep" aria-hidden="true">·</span>
-          <button class="footer-link" @click="goToRegister">Registrarse</button>
+          <button class="footer-link" @click="goToLogin">Mi Cuenta</button>
         </nav>
       </div>
     </footer>
