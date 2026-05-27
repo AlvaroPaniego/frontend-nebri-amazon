@@ -4,11 +4,14 @@ import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useProductStore } from '@/store/products';
 import { useCartStore } from '@/store/cart';
+import AppNavbar from '@/components/organisms/AppNavbar.vue';
 
 const route = useRoute();
 const router = useRouter();
 const productStore = useProductStore();
 const cartStore = useCartStore();
+
+const { totalItemsCount } = storeToRefs(cartStore);
 
 const { loading, error } = storeToRefs(productStore);
 
@@ -94,10 +97,28 @@ const handleAddToCart = async () => {
 const handleBack = () => {
   router.push('/catalog');
 };
+
+const handleNavigation = (destination) => {
+  if (destination === 'Login') {
+    router.push({ name: 'Login' });
+  } else if (destination === 'Catalog') {
+    router.push({ name: 'Catalog' });
+  } else if (destination === 'cart') {
+    router.push({ name: 'Cart' });
+  } else if (destination === 'Home') {
+    router.push({ name: 'Home' });
+  }
+};
 </script>
 
 <template>
-  <main class="product-detail-view" aria-label="Detalle de producto">
+  <div class="product-detail-layout-container">
+    <AppNavbar 
+      :cart-count="totalItemsCount"
+      @navigate="handleNavigation"
+    />
+
+    <main class="product-detail-view" aria-label="Detalle de producto">
     
     <!-- ─── Enlace de Retorno (Breadcrumbs) ─── -->
     <nav class="detail-nav" aria-label="Navegación de retorno">
@@ -263,9 +284,18 @@ const handleBack = () => {
 
     </article>
   </main>
+  </div>
 </template>
 
 <style scoped>
+.product-detail-layout-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-background);
+  font-family: var(--font-sans);
+}
+
 .product-detail-view {
   max-width: 1200px;
   margin: 0 auto;

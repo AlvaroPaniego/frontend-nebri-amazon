@@ -1,9 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import { useAuthStore } from './auth';
-
-// Helper de utilidad para simular latencia de red de forma limpia sin callback hell (Clean Code)
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+import * as cartService from '@/services/cartService';
 
 // Generador de UUID v4 estándar para identificar de forma segura el carrito y los artículos
 const generateUUID = () => {
@@ -118,16 +116,14 @@ export const useCartStore = defineStore('cart', () => {
       if (!authStore.isAuthenticated) {
         items.value = loadLocalItems();
       } else {
-        // Simulación controlada de latencia de red para sincronización híbrida futura
-        await delay(500);
-        
-        // Estructura preparada para sincronización remota:
-        // const localItems = loadLocalItems();
-        // const remoteCart = await cartService.syncCart(cartId.value, localItems);
-        // items.value = remoteCart.items;
-        
-        // De manera temporal, cargamos la estructura local
-        items.value = loadLocalItems();
+        const localItems = loadLocalItems();
+        try {
+          const remoteCart = await cartService.syncCart(cartId.value, localItems);
+          items.value = remoteCart.items || [];
+        } catch(e) {
+          console.error("Error sincronizando", e);
+          items.value = localItems;
+        }
       }
     } catch (error) {
       console.error('Error al inicializar el estado del carrito:', error);
@@ -182,10 +178,11 @@ export const useCartStore = defineStore('cart', () => {
 
       const authStore = useAuthStore();
       if (authStore.isAuthenticated) {
-        // Simula la llamada asíncrona para despachar el POST /api/cart/items al servidor
-        await delay(300);
-        // Integración con cartService:
-        // await cartService.addCartItem(cartId.value, product.id, quantity);
+        try {
+          await cartService.addCartItem(cartId.value, product.id, quantity);
+        } catch(e) {
+          console.error("Error al añadir en el backend", e);
+        }
       } else {
         localStorage.setItem('nebriamazon_cart_items', JSON.stringify(items.value));
       }
@@ -226,10 +223,11 @@ export const useCartStore = defineStore('cart', () => {
 
       const authStore = useAuthStore();
       if (authStore.isAuthenticated) {
-        // Simula la llamada asíncrona para despachar el PUT /api/cart/items/:id
-        await delay(300);
-        // Integración con cartService:
-        // await cartService.updateCartItem(cartId.value, itemId, newQuantity);
+        try {
+          await cartService.updateCartItem(cartId.value, itemId, newQuantity);
+        } catch(e) {
+          console.error("Error al actualizar en el backend", e);
+        }
       } else {
         localStorage.setItem('nebriamazon_cart_items', JSON.stringify(items.value));
       }
@@ -254,10 +252,11 @@ export const useCartStore = defineStore('cart', () => {
 
       const authStore = useAuthStore();
       if (authStore.isAuthenticated) {
-        // Simula la llamada asíncrona para despachar el DELETE /api/cart/items/:id
-        await delay(300);
-        // Integración con cartService:
-        // await cartService.removeCartItem(cartId.value, itemId);
+        try {
+          await cartService.removeCartItem(cartId.value, itemId);
+        } catch(e) {
+          console.error("Error al eliminar en el backend", e);
+        }
       } else {
         localStorage.setItem('nebriamazon_cart_items', JSON.stringify(items.value));
       }
@@ -278,10 +277,11 @@ export const useCartStore = defineStore('cart', () => {
 
       const authStore = useAuthStore();
       if (authStore.isAuthenticated) {
-        // Simula la llamada asíncrona para vaciar la cesta en base de datos
-        await delay(300);
-        // Integración con cartService:
-        // await cartService.clearCart(cartId.value);
+        try {
+          await cartService.clearCart(cartId.value);
+        } catch(e) {
+          console.error("Error al limpiar en el backend", e);
+        }
       }
     } finally {
       loading.value = false;
