@@ -73,12 +73,15 @@ async function restoreUserSession() {
 const goToCatalog = () => router.push({ name: 'Catalog' });
 const goToLogin = () => router.push({ name: 'Login' });
 const goToRegister = () => router.push({ name: 'Register' });
+const goToCart = () => router.push({ name: 'Cart' });
 
 const handleNavigation = (destination) => {
   if (destination === 'Login') {
     goToLogin();
   } else if (destination === 'Catalog') {
     goToCatalog();
+  } else if (destination === 'cart') {
+    goToCart();
   }
 };
 

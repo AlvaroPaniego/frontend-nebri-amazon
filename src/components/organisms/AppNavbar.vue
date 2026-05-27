@@ -1,16 +1,23 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useCartStore } from '@/store/cart'
 import SearchBar from '@/components/molecules/SearchBar.vue'
 import BaseBadge from '@/components/atoms/BaseBadge.vue'
 
 defineProps({
   cartCount: {
     type: Number,
-    default: 0
+    default: undefined
   }
 })
 
 const emit = defineEmits(['search', 'navigate'])
+
+const router = useRouter()
+const cartStore = useCartStore()
+const { totalItemsCount } = storeToRefs(cartStore)
 
 const isMobileMenuOpen = ref(false)
 
@@ -21,6 +28,18 @@ const handleSearch = (query) => {
 const handleNavigation = (destination) => {
   emit('navigate', destination)
   isMobileMenuOpen.value = false
+  
+  if (router) {
+    if (destination === 'home') {
+      router.push({ name: 'Home' }).catch(() => {})
+    } else if (destination === 'Login') {
+      router.push({ name: 'Login' }).catch(() => {})
+    } else if (destination === 'Catalog') {
+      router.push({ name: 'Catalog' }).catch(() => {})
+    } else if (destination === 'cart') {
+      router.push({ name: 'Cart' }).catch(() => {})
+    }
+  }
 }
 
 const toggleMobileMenu = () => {
@@ -76,7 +95,7 @@ const toggleMobileMenu = () => {
               <circle cx="20" cy="21" r="1"></circle>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
-            <BaseBadge :count="cartCount" />
+            <BaseBadge :count="cartCount !== undefined ? cartCount : totalItemsCount" />
           </div>
           <span class="cart-text">Carrito</span>
         </div>
