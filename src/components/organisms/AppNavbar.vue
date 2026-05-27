@@ -1,16 +1,26 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useCartStore } from '@/store/cart'
+import { useAuthStore } from '@/store/auth'
 import SearchBar from '@/components/molecules/SearchBar.vue'
 import BaseBadge from '@/components/atoms/BaseBadge.vue'
 
 defineProps({
   cartCount: {
     type: Number,
-    default: 0
+    default: undefined
   }
 })
 
 const emit = defineEmits(['search', 'navigate'])
+
+const router = useRouter()
+const cartStore = useCartStore()
+const { totalItemsCount } = storeToRefs(cartStore)
+const authStore = useAuthStore()
+const { isAuthenticated, user } = storeToRefs(authStore)
 
 const isMobileMenuOpen = ref(false)
 
@@ -20,6 +30,23 @@ const handleSearch = (query) => {
 
 const handleNavigation = (destination) => {
   emit('navigate', destination)
+  isMobileMenuOpen.value = false
+  
+  if (router) {
+    if (destination === 'home') {
+      router.push({ name: 'Home' }).catch(() => {})
+    } else if (destination === 'Login') {
+      router.push({ name: 'Login' }).catch(() => {})
+    } else if (destination === 'Catalog') {
+      router.push({ name: 'Catalog' }).catch(() => {})
+    } else if (destination === 'cart') {
+      router.push({ name: 'Cart' }).catch(() => {})
+    }
+  }
+}
+
+const handleLogout = async () => {
+  await authStore.logout()
   isMobileMenuOpen.value = false
 }
 
@@ -43,9 +70,27 @@ const toggleMobileMenu = () => {
 
       <!-- Menú de Acciones de Usuario y Carrito -->
       <div class="navbar-actions" :class="{ 'mobile-open': isMobileMenuOpen }">
-        <div class="action-item" @click="handleNavigation('Login')" role="button" tabindex="0">
+        <div 
+          v-if="!isAuthenticated" 
+          class="action-item" 
+          @click="handleNavigation('Login')" 
+          role="button" 
+          tabindex="0"
+          aria-label="Iniciar sesión"
+        >
           <span class="action-subtext">Hola, Identifícate</span>
           <span class="action-text">Cuenta y Listas</span>
+        </div>
+        <div 
+          v-else 
+          class="action-item user-profile-action" 
+          @click="handleLogout" 
+          role="button" 
+          tabindex="0"
+          aria-label="Cerrar sesión"
+        >
+          <span class="action-subtext">Hola, {{ user?.name }}</span>
+          <span class="action-text logout-btn">Cerrar Sesión</span>
         </div>
 
         <div class="action-item" @click="handleNavigation('orders')" role="button" tabindex="0">
@@ -76,7 +121,7 @@ const toggleMobileMenu = () => {
               <circle cx="20" cy="21" r="1"></circle>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
-            <BaseBadge :count="cartCount" />
+            <BaseBadge :count="cartCount !== undefined ? cartCount : totalItemsCount" />
           </div>
           <span class="cart-text">Carrito</span>
         </div>
