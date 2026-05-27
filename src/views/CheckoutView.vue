@@ -131,7 +131,7 @@ const goToCart    = () => router.push({ name: 'Cart' });
         </div>
         <div class="detail-row">
           <dt>Código de seguimiento</dt>
-          <dd class="detail-highlight tracking-code">{{ confirmedOrder.trackingCode || `NA-000${confirmedOrder.id}` }}</dd>
+          <dd class="detail-highlight tracking-code">{{ confirmedOrder.trackingCode || confirmedOrder.tracking_code || `NA-000${confirmedOrder.id}` }}</dd>
         </div>
         <div class="detail-row">
           <dt>Total cobrado</dt>
