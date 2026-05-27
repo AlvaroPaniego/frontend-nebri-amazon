@@ -127,15 +127,15 @@ const goToCart    = () => router.push({ name: 'Cart' });
       <dl class="confirmation-details">
         <div class="detail-row">
           <dt>Número de pedido</dt>
-          <dd class="detail-highlight">{{ confirmedOrder.orderId.split('-')[0].toUpperCase() }}</dd>
+          <dd class="detail-highlight">{{ String(confirmedOrder.orderId || confirmedOrder.id).split('-')[0].toUpperCase() }}</dd>
         </div>
         <div class="detail-row">
           <dt>Código de seguimiento</dt>
-          <dd class="detail-highlight tracking-code">{{ confirmedOrder.trackingCode }}</dd>
+          <dd class="detail-highlight tracking-code">{{ confirmedOrder.trackingCode || `NA-000${confirmedOrder.id}` }}</dd>
         </div>
         <div class="detail-row">
           <dt>Total cobrado</dt>
-          <dd class="detail-highlight">{{ confirmedOrder.total.toFixed(2) }} €</dd>
+          <dd class="detail-highlight">{{ Number(confirmedOrder.total || confirmedOrder.total_price || 0).toFixed(2) }} €</dd>
         </div>
       </dl>
 

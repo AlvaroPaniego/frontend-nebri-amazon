@@ -1,5 +1,10 @@
 <script setup>
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useCartStore } from '@/store/cart';
+
+const router = useRouter();
+const cartStore = useCartStore();
 
 const props = defineProps({
   product: {
@@ -23,6 +28,19 @@ const formattedPrice = computed(() => {
 const isAvailable = computed(() => {
   return (props.product?.stock ?? 0) > 0;
 });
+
+const viewDetails = () => {
+  router.push({ name: 'ProductDetail', params: { id: props.product.sku || props.product.id } });
+};
+
+const addToCart = async () => {
+  if (!isAvailable.value) return;
+  try {
+    await cartStore.addItem(props.product);
+  } catch (error) {
+    console.error('Error al añadir al carrito:', error);
+  }
+};
 </script>
 
 <template>
@@ -62,28 +80,39 @@ const isAvailable = computed(() => {
           {{ formattedPrice }}
         </span>
 
-        <!-- Botón accesible de detalles -->
-        <router-link
-          :to="'/product/' + product.sku"
-          class="details-button"
-          :aria-label="'Ver detalles de ' + product.name"
-        >
-          Ver Detalles
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="arrow-icon"
-            aria-hidden="true"
+        <div class="card-actions">
+          <button
+            class="add-to-cart-btn"
+            @click.stop="addToCart"
+            :disabled="!isAvailable"
+            :aria-label="'Añadir ' + product.name + ' al carrito'"
           >
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-            <polyline points="12 5 19 12 12 19"></polyline>
-          </svg>
-        </router-link>
+            Añadir al carrito
+          </button>
+
+          <!-- Botón accesible de detalles -->
+          <button
+            @click.stop="viewDetails"
+            class="details-button"
+            :aria-label="'Ver detalles de ' + product.name"
+          >
+            Ver Detalles
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="arrow-icon"
+              aria-hidden="true"
+            >
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   </article>
@@ -205,7 +234,7 @@ const isAvailable = computed(() => {
 /* Pie de Tarjeta */
 .card-footer {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   margin-top: auto;
   gap: 0.5rem;
@@ -216,6 +245,49 @@ const isAvailable = computed(() => {
   font-weight: 800;
   color: var(--color-primary);
   letter-spacing: -0.3px;
+  margin-bottom: 0.3rem;
+}
+
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+/* Botón Añadir al Carrito */
+.add-to-cart-btn {
+  background-color: var(--color-accent);
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: transform var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
+  outline: none;
+}
+
+.add-to-cart-btn:hover:not(:disabled) {
+  background-color: var(--color-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 153, 0, 0.3);
+}
+
+.add-to-cart-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.add-to-cart-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--color-border);
+}
+
+.add-to-cart-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 /* Botón de Detalles Premium */
