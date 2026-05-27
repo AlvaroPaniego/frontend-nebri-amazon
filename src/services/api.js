@@ -49,6 +49,7 @@ api.interceptors.response.use(
 
     // 401 → token expirado/inválido → cierre de sesión seguro automático
     if (error.response?.status === 401) {
+      alert('Error de autenticación. Tu sesión ha expirado o no es válida. Por favor, vuelve a iniciar sesión.');
       authStore.logout();
     }
 
