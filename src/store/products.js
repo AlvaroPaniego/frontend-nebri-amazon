@@ -111,6 +111,26 @@ export const useProductStore = defineStore('products', () => {
   };
 
   /**
+   * fetchProductsByCategory - Carga productos filtrados por categoría desde el backend.
+   *
+   * @param {number|string} categoryId - ID de la categoría
+   */
+  const fetchProductsByCategory = async (categoryId) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const data = await productService.getProductsByCategory(categoryId);
+      products.value = data;
+      return data;
+    } catch (err) {
+      error.value = err.message || 'Error al recuperar productos de la categoría.';
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /**
    * fetchProductBySku - Carga la ficha de un producto específico mediante su SKU.
    * Revisa primero el caché indexado y la colección cargada localmente.
    *
@@ -161,18 +181,27 @@ export const useProductStore = defineStore('products', () => {
 
   /**
    * setSelectedCategory - Selecciona la categoría activa de filtrado
+   * y obtiene los productos del backend para esa categoría.
    *
    * @param {number|string|null} categoryId - ID de la categoría
    */
-  const setSelectedCategory = (categoryId) => {
-    selectedCategory.value = categoryId;
+  const setSelectedCategory = async (categoryId) => {
+    if (categoryId !== null && categoryId !== undefined && categoryId !== '') {
+      await fetchProductsByCategory(categoryId);
+      selectedCategory.value = categoryId;
+    } else {
+      await fetchProducts(true);
+      selectedCategory.value = null;
+    }
   };
 
   /**
-   * resetFilters - Restablece todos los criterios de búsqueda y filtros
+   * resetFilters - Restablece todos los criterios de búsqueda y filtros,
+   * y recarga el catálogo completo desde el backend.
    */
-  const resetFilters = () => {
+  const resetFilters = async () => {
     searchQuery.value = '';
+    await fetchProducts(true);
     selectedCategory.value = null;
   };
 
@@ -204,6 +233,7 @@ export const useProductStore = defineStore('products', () => {
     cache,
     getFilteredProducts,
     fetchProducts,
+    fetchProductsByCategory,
     fetchCategories,
     fetchProductBySku,
     setSearchQuery,

@@ -28,7 +28,16 @@ export const getProductBySku = async (sku) => {
   }
 };
 
+
+export const getProductsByCategory = async (categoryId) => {
+  const response = await api.get(`/categories/${categoryId}/products`);
+  return response.data;
+};
+
 export const getCategories = async () => {
   const response = await api.get('/categories');
   return response.data;
+
 };
+
+
