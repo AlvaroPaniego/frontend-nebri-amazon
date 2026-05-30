@@ -12,22 +12,22 @@ export const placeOrder = async (shippingData, paymentData, cartItems, orderTota
 
   const sanitizedPayment = {
     cardholderName: paymentData.cardholderName,
-    cardLastFour:   rawCardNumber.slice(-4),
-    expiry:         paymentData.expiry,
+    cardLastFour: rawCardNumber.slice(-4),
+    expiry: paymentData.expiry,
   };
 
   const sharedItems = cartItems.map((item) => ({
     productId: item.product.id,
-    sku:       item.product.sku,
-    quantity:  item.quantity,
+    sku: item.product.sku,
+    quantity: item.quantity,
     unitPrice: item.product.price,
   }));
 
   const backendPayload = {
     shipping: shippingData,
-    payment:  sanitizedPayment,
-    items:    sharedItems,
-    total:    orderTotal,
+    payment: sanitizedPayment,
+    items: sharedItems,
+    total: orderTotal,
   };
 
   try {

@@ -28,7 +28,11 @@ export const getProductBySku = async (sku) => {
   }
 };
 
+
 export const getCategories = async () => {
   const response = await api.get('/categories');
   return response.data;
+
 };
+
+
