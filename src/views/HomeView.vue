@@ -475,15 +475,15 @@ const handleNavigation = (destination) => {
 }
 
 .cta-btn--ghost {
-  background-color: transparent;
-  color: rgba(255, 255, 255, 0.85);
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.1); /* Fondo sutil para que tenga cuerpo */
+  color: var(--color-surface); /* Texto en blanco sólido y legible */
+  border: 1.5px solid rgba(255, 255, 255, 0.4); /* Borde visible */
 }
 
 .cta-btn--ghost:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.6);
-  color: var(--color-surface);
+  background-color: rgba(255, 255, 255, 0.2); /* Se aclara al pasar el ratón */
+  border-color: var(--color-accent); /* ¡Un toque dorado del color corporativo al hacer hover! */
+  transform: translateY(-2px); /* Pequeño salto hacia arriba igual que el botón primario */
 }
 
 .cta-btn--ghost:focus-visible {
