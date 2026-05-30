@@ -9,17 +9,16 @@
  *   2. Desacoplamiento total: los datos se solicitan al montar y se mapean en la vista.
  *   3. Visuales Premium: Shimmer skeleton loaders para mitigar el CLS.
  *   4. Badges de estado HSL dinámicos y transparentes de alta calidad.
- *   5. Acoplamiento reactivo con useProductStore para resolver nombres y miniaturas de productos.
+ *   5. Los datos de cada producto vienen incrustados en la respuesta del endpoint.
  *   6. Semántica e interactividad accesible con etiquetas ARIA completas.
  *
  * Aplicando principios de Clean Code (Uncle Bob) de forma estricta.
  */
 
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useOrdersStore } from '@/store/orders';
-import { useProductStore } from '@/store/products';
 import { useAuthStore } from '@/store/auth';
 import AppNavbar from '@/components/organisms/AppNavbar.vue';
 
@@ -27,12 +26,10 @@ const router = useRouter();
 
 // Stores
 const ordersStore = useOrdersStore();
-const productStore = useProductStore();
 const authStore = useAuthStore();
 
 // Referencias reactivas desacopladas
 const { orders, loading, error } = storeToRefs(ordersStore);
-const { products } = storeToRefs(productStore);
 const { isAuthenticated } = storeToRefs(authStore);
 
 // Estado local para controlar qué pedidos tienen el desglose expandido
@@ -46,14 +43,10 @@ onMounted(async () => {
     return;
   }
 
-  // Carga concurrente del historial de pedidos y del catálogo de productos para la caché
+  // Carga del historial de pedidos (los datos de cada producto vienen incrustados en la respuesta)
   try {
-    await Promise.all([
-      ordersStore.fetchUserOrders(),
-      productStore.fetchProducts()
-    ]);
+    await ordersStore.fetchUserOrders();
   } catch (err) {
-    // Captura limpia reportada en la UI a través del estado reactivo del store
     console.error('Error durante la carga inicial del historial:', err);
   }
 });
@@ -79,29 +72,24 @@ const formatCurrency = (amount) => {
   }).format(Number(amount));
 };
 
-// Obtiene los datos detallados del producto desde la caché reactiva
-const resolveProductData = (productId) => {
-  // Intentamos buscar por coincidencia exacta de ID
-  const matched = products.value.find(p => Number(p.id) === Number(productId));
-  
-  if (matched) {
+// Obtiene los datos del producto desde la respuesta del endpoint (con fallback)
+const resolveProductData = (item) => {
+  if (item?.product) {
     return {
-      name: matched.name,
-      sku: matched.sku,
-      image: matched.image_urls?.[0] || matched.image || ''
+      name: item.product.name,
+      sku: item.product.sku,
+      image: item.product.image_url || ''
     };
   }
-
-  // Retorno defensivo con placeholders limpios
   return {
-    name: `Producto de NebriAmazon (Ref: #${productId})`,
+    name: `Producto (Ref: #${item?.product_id})`,
     sku: null,
     image: ''
   };
 };
 
-const resolveProductImage = (productId) => {
-  const data = resolveProductData(productId);
+const resolveProductImage = (item) => {
+  const data = resolveProductData(item);
   return data.image || `https://placehold.co/64x64/131921/FF9900?text=${encodeURIComponent(data.name[0] || 'N')}`;
 };
 
@@ -278,8 +266,8 @@ const goToProduct = (sku) => {
                   class="order-item-row"
                 >
                   <img 
-                    :src="resolveProductImage(item.product_id)"
-                    :alt="resolveProductData(item.product_id).name"
+                    :src="resolveProductImage(item)"
+                    :alt="resolveProductData(item).name"
                     class="item-image"
                     loading="lazy"
                     width="64"
@@ -289,12 +277,12 @@ const goToProduct = (sku) => {
                   <div class="item-details">
                     <span 
                       class="item-name" 
-                      :class="{ 'clickable-link': resolveProductData(item.product_id).sku }"
-                      @click="goToProduct(resolveProductData(item.product_id).sku)"
+                      :class="{ 'clickable-link': resolveProductData(item).sku }"
+                      @click="goToProduct(resolveProductData(item).sku)"
                       role="button"
                       tabindex="0"
                     >
-                      {{ resolveProductData(item.product_id).name }}
+                      {{ resolveProductData(item).name }}
                     </span>
                     <span class="item-meta">
                       Cantidad: <strong>{{ item.quantity }}</strong> &times; {{ formatCurrency(item.price_snapshot || 0) }}
