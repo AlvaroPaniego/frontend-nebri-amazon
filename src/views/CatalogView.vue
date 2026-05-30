@@ -41,8 +41,8 @@ const handleClearAll = () => {
       <div class="search-wrapper">
         <SearchBar />
       </div>
-      <!-- variant="auto" → chips visible solo en ≤ 900 px -->
-      <CategoryFilter variant="auto" />
+      <!-- chips visible solo en ≤ 900 px -->
+      <CategoryFilter variant="chips" />
     </section>
 
     <!-- ─── Layout Dos Columnas: Sidebar + Rejilla de Productos ─── -->
@@ -51,8 +51,8 @@ const handleClearAll = () => {
       <!-- Barra Lateral de Categorías (Escritorio ≥ 901 px) -->
       <aside class="catalog-sidebar" aria-label="Filtros del catálogo">
         <div class="sidebar-sticky-panel">
-          <!-- variant="auto" → sidebar visible solo en > 900 px -->
-          <CategoryFilter variant="auto" />
+          <!-- sidebar visible solo en > 900 px -->
+          <CategoryFilter variant="sidebar" />
 
           <!-- Panel de Filtros Activos -->
           <div
@@ -89,12 +89,19 @@ const handleClearAll = () => {
       <section class="catalog-main-content" aria-label="Listado de artículos">
 
         <div class="results-meta-header">
-          <h2 class="meta-title">Nuestros Artículos</h2>
+          <h2 class="meta-title">
+            <template v-if="selectedCategory !== null">
+              {{ categories.find(c => c.id === selectedCategory)?.name || 'Categoría' }}
+            </template>
+            <template v-else>
+              Todos los Productos
+            </template>
+          </h2>
           <div class="results-counter" aria-live="polite" :aria-busy="loading">
             <span v-if="loading" class="loading-inline-spinner">Cargando...</span>
             <span v-else>
-              Mostrando <strong>{{ filteredProductsCount }}</strong>
-              {{ filteredProductsCount === 1 ? 'producto' : 'productos' }} disponibles.
+              <strong>{{ filteredProductsCount }}</strong>
+              {{ filteredProductsCount === 1 ? 'producto' : 'productos' }}
             </span>
           </div>
         </div>
