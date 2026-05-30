@@ -5,18 +5,23 @@ import CartView from '@/views/CartView.vue';
 import CheckoutView from '@/views/CheckoutView.vue';
 import RegisterView from '@/views/RegisterView.vue';
 import ProductDetailView from '@/views/ProductDetailView.vue';
+import CatalogView from '@/views/CatalogView.vue'; // <-- Import correcto
 
 const router = createRouter({
         history: createWebHistory(),
         routes: [
                 { path: '/', name: 'Home', component: HomeView },
-                { path: '/catalog', name: 'Catalog', component: HomeView },
+                { path: '/catalog', name: 'Catalog', component: CatalogView }, // <-- Usando CatalogView
                 { path: '/product/:id', name: 'ProductDetail', component: ProductDetailView },
                 { path: '/login', name: 'Login', component: LoginView },
                 { path: '/cart', name: 'Cart', component: CartView },
                 { path: '/checkout', name: 'Checkout', component: CheckoutView },
-                { path: '/register', name: 'Register', component: RegisterView }
-
+                { path: '/register', name: 'Register', component: RegisterView },
+                {
+                        path: '/orders',
+                        name: 'OrdersHistory',
+                        component: () => import('@/views/OrdersHistoryView.vue')
+                }
         ]
 });
 
