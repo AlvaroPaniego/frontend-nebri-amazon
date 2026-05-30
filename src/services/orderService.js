@@ -40,3 +40,16 @@ export const placeOrder = async (shippingData, paymentData, cartItems, orderTota
     throw error;
   }
 };
+
+export const getUserOrders = async () => {
+  try {
+    const response = await api.get('/orders');
+    return response.data;
+  } catch (error) {
+    if (isTypedError(error)) {
+      throw error;
+    }
+    throw error;
+  }
+};
+

@@ -141,7 +141,7 @@ export const useAuthStore = defineStore('auth', () => {
         const routerModule = await import('@/router');
         const router = routerModule.default;
         if (router && typeof router.push === 'function') {
-          await router.push('/catalog').catch(() => {
+          await router.push('/').catch(() => {
             // Manejo silencioso
           });
         }

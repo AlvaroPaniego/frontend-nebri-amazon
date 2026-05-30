@@ -41,6 +41,8 @@ const handleNavigation = (destination) => {
       router.push({ name: 'Catalog' }).catch(() => {})
     } else if (destination === 'cart') {
       router.push({ name: 'Cart' }).catch(() => {})
+    } else if (destination === 'orders') {
+      router.push({ name: 'OrdersHistory' }).catch(() => {})
     }
   }
 }
